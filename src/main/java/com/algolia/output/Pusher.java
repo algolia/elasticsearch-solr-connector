@@ -17,6 +17,7 @@ public class Pusher extends Output {
 	
 	public Pusher(String appID, String apiKey, String indexName) {
 		index = new APIClient(appID, apiKey).initIndex(indexName);
+		batch = new ArrayList<>();
 	}
 	
 	@Override

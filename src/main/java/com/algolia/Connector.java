@@ -7,6 +7,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Options;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.algolia.output.Output;
@@ -26,13 +27,13 @@ public class Connector
 	 * Constants
 	 */
 	// {NAME, SHORT_NAME, DESC, PARAM}
-	public static final String[][] CONF_NAME = { { "url", null, "Url for elasticsearch.", "" }, {"port", null, "Port of elasticsearch.", ""}, { "index", "i", "the index name", "" },
+	public static final String[][] CONF_NAME = { { "url", null, "Url for elasticsearch.", "" }, {"port", null, "Port of elasticsearch.", ""}, {"cluster", null, "Name of the cluster.", ""}, { "index", "i", "the index name", "" },
 			{ "debug", "d", "Activate the debug mode", null }, { "appID", "u", "The application ID.", "" }, { "apiKey", "p", "The api key.", "" },
 			{ "help", "h", "Print help", null } };
 
 	// Index of parameter in the CONF_NAME variable
 	public enum CONF_IDX {
-		CONF_URL, CONF_PORT, CONF_INDEXNAME, CONF_DEBUG, CONF_APPID, CONF_APIKEY, CONF_HELP
+		CONF_URL, CONF_PORT, CONF_CLUSTERNAME, CONF_INDEXNAME, CONF_DEBUG, CONF_APPID, CONF_APIKEY, CONF_HELP
 	}
 	
 	/*
@@ -53,7 +54,7 @@ public class Connector
 		System.exit(1);
 	}
 	
-    public static void main( String[] args )
+    public static void main( String[] args ) throws JSONException
     {
     	CommandLine cli = null;
 		if (CONF_NAME.length != CONF_IDX.values().length) {
@@ -90,6 +91,9 @@ public class Connector
 			if (!cli.hasOption(CONF_NAME[CONF_IDX.CONF_PORT.ordinal()][0])) {
 				throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_PORT.ordinal()][0]));
 			}
+			if (!cli.hasOption(CONF_NAME[CONF_IDX.CONF_CLUSTERNAME.ordinal()][0])) {
+				throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_CLUSTERNAME.ordinal()][0]));
+			}
 		} catch (MissingOptionException e) {
 			throw new Error(e);
 			//usage();
@@ -104,7 +108,7 @@ public class Connector
 		}
 		
 		logger.info(String.format("Start enumaration %s", cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0])));
-		Enumerator enumerator = new Enumerator(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_URL.ordinal()][0]), Integer.parseInt(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_PORT.ordinal()][0])), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0]), output);
+		Enumerator enumerator = new Enumerator(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_URL.ordinal()][0]), Integer.parseInt(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_PORT.ordinal()][0])), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_CLUSTERNAME.ordinal()][0]), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0]), output);
 		enumerator.enumerate();
 		logger.info("End enumaration");
 		output.close();
