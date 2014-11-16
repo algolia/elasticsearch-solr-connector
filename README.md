@@ -7,7 +7,7 @@ Setup
 -----
 
 ```shell
-TODO
+curl -fsSL https://raw.github.com/algolia/elasticsearch-connector/master/dist/elasticsearch-connector.sh > elasticsearch-connector.sh
 ```
 
 Usage
