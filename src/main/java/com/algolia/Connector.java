@@ -27,7 +27,7 @@ public class Connector
 	 * Constants
 	 */
 	// {NAME, SHORT_NAME, DESC, PARAM}
-	public static final String[][] CONF_NAME = { { "url", null, "Url for elasticsearch.", "" }, {"port", null, "Port of elasticsearch.", ""}, {"cluster", null, "Name of the cluster.", ""}, { "index", "i", "the index name", "" },
+	public static final String[][] CONF_NAME = { { "url", null, "Url for elasticsearch.", "" }, {"port", null, "Port of elasticsearch.", ""}, {"cluster", null, "Name of the cluster.", ""}, { "index", "i", "Index name", "" },
 			{ "debug", "d", "Activate the debug mode", null }, { "appID", "u", "The application ID.", "" }, { "apiKey", "p", "The api key.", "" },
 			{ "help", "h", "Print help", null } };
 
@@ -47,11 +47,11 @@ public class Connector
 		}
 	}
 	
-	private static void usage() {
+	private static void usage(Exception e) {
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.setWidth(160);
 		formatter.printHelp("Elasticsearchconnector [option]...", options);
-		System.exit(1);
+		throw new Error(e);
 	}
 	
     public static void main( String[] args ) throws JSONException
@@ -66,11 +66,11 @@ public class Connector
 			cli = new BasicParser().parse(options, args, false);
 			String[] unparsedTargets = cli.getArgs();
 			if (unparsedTargets.length > 0 || cli.hasOption(CONF_NAME[CONF_IDX.CONF_HELP.ordinal()][0])) {
-				usage();
+				usage(new Exception());
 			}
 		} catch (org.apache.commons.cli.ParseException e) {
 		    System.err.println(e.getMessage());
-			usage();
+			usage(e);
 		}
 		
 		try {
@@ -95,8 +95,7 @@ public class Connector
 				throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_CLUSTERNAME.ordinal()][0]));
 			}
 		} catch (MissingOptionException e) {
-			throw new Error(e);
-			//usage();
+			usage(e);
 		}
 		
 		Output output;
