@@ -10,6 +10,7 @@ import org.apache.commons.cli.Options;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.algolia.input.Elasticsearch;
 import com.algolia.output.Output;
 import com.algolia.output.Printer;
 import com.algolia.output.Pusher;
@@ -107,7 +108,7 @@ public class Connector
 		}
 		
 		logger.info(String.format("Start enumaration %s", cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0])));
-		Enumerator enumerator = new Enumerator(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_URL.ordinal()][0]), Integer.parseInt(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_PORT.ordinal()][0])), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_CLUSTERNAME.ordinal()][0]), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0]), output);
+		Elasticsearch enumerator = new Elasticsearch(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_URL.ordinal()][0]), Integer.parseInt(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_PORT.ordinal()][0])), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_CLUSTERNAME.ordinal()][0]), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0]), output);
 		enumerator.enumerate();
 		logger.info("End enumaration");
 		output.close();
