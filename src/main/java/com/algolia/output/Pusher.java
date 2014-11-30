@@ -43,6 +43,7 @@ public class Pusher extends Output {
 
 	@Override
 	public void close() {
+		flush();
 		index = null;
 	}
 

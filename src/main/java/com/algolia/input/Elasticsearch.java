@@ -19,12 +19,18 @@ public class Elasticsearch extends Input {
 	protected String indexName;
 	private final int SEARCH_SIZE = 10000;
 
-	public Elasticsearch(String host, int port, String clusterName, String indexName, Output output) {
+	public Elasticsearch(Output output, String... params) {
 		super(output);
+		if (params.length != 4) {
+			throw new Error("Elasticsearch needs 4 parameters (URL:PORT:CLUSTER:INDEX");
+		}
+		String host = params[0];
+		int port = Integer.parseInt(params[1]);
+		String clusterName = params[2];
+		this.indexName = params[3];
 		Settings settings = ImmutableSettings.settingsBuilder().put("client.transport.sniff", true).put("cluster.name", clusterName).build();
 		client = new TransportClient(settings);
 		((TransportClient) client).addTransportAddress(new InetSocketTransportAddress(host, port));
-		this.indexName = indexName;
 	}
 	
 	public void enumerate() {

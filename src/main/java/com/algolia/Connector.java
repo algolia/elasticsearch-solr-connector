@@ -11,6 +11,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.algolia.input.Elasticsearch;
+import com.algolia.input.Input;
+import com.algolia.input.Solr;
 import com.algolia.output.Output;
 import com.algolia.output.Printer;
 import com.algolia.output.Pusher;
@@ -28,13 +30,13 @@ public class Connector
 	 * Constants
 	 */
 	// {NAME, SHORT_NAME, DESC, PARAM}
-	public static final String[][] CONF_NAME = { { "url", null, "Url for elasticsearch.", "" }, {"port", null, "Port of elasticsearch.", ""}, {"cluster", null, "Name of the cluster.", ""}, { "index", "i", "Index name", "" },
-			{ "debug", "d", "Activate the debug mode", null }, { "appID", "u", "The application ID.", "" }, { "apiKey", "p", "The api key.", "" },
+	public static final String[][] CONF_NAME = { { "params", null, "Parameters for the input.", "" }, {"input", null, "ES or SOLR", ""},
+			{ "debug", "d", "Activate the debug mode", null }, { "appID", "u", "The application ID.", "" }, { "apiKey", "p", "The api key.", "" }, { "indexName", "i", "Name of the output index.", ""},
 			{ "help", "h", "Print help", null } };
 
 	// Index of parameter in the CONF_NAME variable
 	public enum CONF_IDX {
-		CONF_URL, CONF_PORT, CONF_CLUSTERNAME, CONF_INDEXNAME, CONF_DEBUG, CONF_APPID, CONF_APIKEY, CONF_HELP
+		CONF_PARAM, CONF_INPUT, CONF_DEBUG, CONF_APPID, CONF_APIKEY, CONF_INDEXNAME, CONF_HELP
 	}
 	
 	/*
@@ -83,17 +85,11 @@ public class Connector
 					throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_APPID.ordinal()][0]));
 				}
 			}
-			if (!cli.hasOption(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0])) {
-				throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0]));
+			if (!cli.hasOption(CONF_NAME[CONF_IDX.CONF_PARAM.ordinal()][0])) {
+				throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_PARAM.ordinal()][0]));
 			}
-			if (!cli.hasOption(CONF_NAME[CONF_IDX.CONF_URL.ordinal()][0])) {
-				throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_URL.ordinal()][0]));
-			}
-			if (!cli.hasOption(CONF_NAME[CONF_IDX.CONF_PORT.ordinal()][0])) {
-				throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_PORT.ordinal()][0]));
-			}
-			if (!cli.hasOption(CONF_NAME[CONF_IDX.CONF_CLUSTERNAME.ordinal()][0])) {
-				throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_CLUSTERNAME.ordinal()][0]));
+			if (!cli.hasOption(CONF_NAME[CONF_IDX.CONF_INPUT.ordinal()][0])) {
+				throw new MissingOptionException(String.format("Missing parameter %s", CONF_NAME[CONF_IDX.CONF_INPUT.ordinal()][0]));
 			}
 		} catch (MissingOptionException e) {
 			usage(e);
@@ -107,8 +103,18 @@ public class Connector
 			output = new Pusher(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_APPID.ordinal()][0]), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_APIKEY.ordinal()][0]), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0]));
 		}
 		
-		logger.info(String.format("Start enumaration %s", cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0])));
-		Elasticsearch enumerator = new Elasticsearch(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_URL.ordinal()][0]), Integer.parseInt(cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_PORT.ordinal()][0])), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_CLUSTERNAME.ordinal()][0]), cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INDEXNAME.ordinal()][0]), output);
+		logger.info(String.format("Start enumaration %s", cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_PARAM.ordinal()][0])));
+		Input enumerator = null;
+		switch (cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_INPUT.ordinal()][0])) {
+			case "ES":
+				enumerator = new Elasticsearch(output, cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_PARAM.ordinal()][0]).split("\\|"));
+				break;
+			case "SOLR":
+				enumerator = new Solr(output, cli.getOptionValue(CONF_NAME[CONF_IDX.CONF_PARAM.ordinal()][0]).split("\\|"));
+				break;
+			default:
+				usage(new MissingOptionException(String.format("Wrong parameter %s", CONF_NAME[CONF_IDX.CONF_INPUT.ordinal()][0])));
+		}
 		enumerator.enumerate();
 		logger.info("End enumaration");
 		output.close();

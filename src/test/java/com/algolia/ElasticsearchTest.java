@@ -8,8 +8,6 @@ import static org.junit.Assert.assertFalse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.logging.ESLogger;
-import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.common.network.NetworkUtils;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.node.Node;
@@ -24,7 +22,7 @@ import com.algolia.search.saas.APIClient;
 import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Index;
 
-public class SimpleTest {
+public class ElasticsearchTest {
 
     protected final static String CLUSTER = "test-cluster-" + NetworkUtils.getLocalAddress().getHostName();
 
@@ -35,7 +33,7 @@ public class SimpleTest {
     private static String applicationID;
     private static String apiKey;
 
-	public SimpleTest() {
+	public ElasticsearchTest() {
 	}
 
 	@BeforeClass
@@ -80,7 +78,7 @@ public class SimpleTest {
 	@Test
 	public void test() throws JSONException {
 		
-       Connector.main(new String[]{"-url", "localhost", "--port", "9300", "--cluster", CLUSTER, "--index", "algolia", "-u", applicationID, "-p", apiKey});
+       Connector.main(new String[]{"-param", "localhost:|9300|" + CLUSTER + "|algolia", "-u", applicationID, "-p", apiKey});
        try {
     	   Thread.sleep(2000); // Wait indexing
 		} catch (InterruptedException e1) {
