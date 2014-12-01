@@ -1,7 +1,7 @@
 #! /bin/sh
 
 if [ "$#" != "2" ]; then
-  echo "Usage : $0 path/to/jar-with-dependencies.jar elasticsearch-connector.sh"
+  echo "Usage : $0 path/to/jar-with-dependencies.jar elasticsearch-solr-connector.sh"
   exit 1
 fi
 command -v uuencode >/dev/null 2>&1 || { echo >&2 "uuencode is required, please install it first."; exit 1; }
