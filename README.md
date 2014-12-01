@@ -14,7 +14,7 @@ Usage
 -----
 
 ```shell
-iusage: Elasticsearchconnector [option]...
+usage: Elasticsearchconnector [option]...
  -d,--debug             Activate the debug mode
  -h,--help              Print help
  -i,--indexName <arg>   Name of the output index.
